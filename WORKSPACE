@@ -381,7 +381,7 @@ filegroup(
 # This is used to get ghc-pkg on Linux.
 nixpkgs_package(
     name = "ghc_nix",
-    attribute_path = "ghc",
+    attribute_path = "ghcWithLLVM",
     build_file_content = """
 package(default_visibility = ["//visibility:public"])
 exports_files(glob(["lib/**/*"]))
@@ -401,7 +401,7 @@ common_ghc_flags = [
 
 # Used by Darwin and Linux
 haskell_register_ghc_nixpkgs(
-    attribute_path = "ghcDwarf" if enable_ghc_dwarf else "ghc",
+    attribute_path = "ghcDwarf" if enable_ghc_dwarf else "ghcWithLLVM",
     build_file = "@io_tweag_rules_nixpkgs//nixpkgs:BUILD.pkg",
 
     # -fexternal-dynamic-refs is required so that we produce position-independent
@@ -419,6 +419,7 @@ haskell_register_ghc_nixpkgs(
         "-optc-mmacosx-version-min=10.14",
         "-opta-mmacosx-version-min=10.14",
         "-optl-mmacosx-version-min=10.14",
+        "-v3",
     ] if is_darwin else ["-optl-s"])),
     compiler_flags_select = {
         "@com_github_digital_asset_daml//:profiling_build": ["-fprof-auto"],
@@ -432,6 +433,12 @@ haskell_register_ghc_nixpkgs(
         "-fexternal-interpreter",
         "-Wwarn",
     ],
+      exec_constraints = [
+"@platforms//cpu:aarch64"
+      ],
+      target_constraints = [
+"@platforms//cpu:aarch64"
+      ],
     repositories = dev_env_nix_repos,
     version = "9.0.2",
 )
@@ -725,6 +732,7 @@ node_repositories(
     # Occasionally, this can cause build failures on CI if a build is not
     # invalidated despite a change of an original source. To avoid such issues
     # we use the `nixpkgs_package` directly.
+    node_version = "16.13.0",
     vendored_node = "@nodejs_dev_env" if is_windows else "@node_nix",
 )
 
