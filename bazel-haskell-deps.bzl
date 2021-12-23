@@ -16,7 +16,9 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@os_info//:os_info.bzl", "is_linux", "is_windows")
 load("@dadew//:dadew.bzl", "dadew_tool_home")
 load("@rules_haskell//haskell:cabal.bzl", "stack_snapshot")
+load("//bazel_tools/ghc-lib:repositories.bzl", "ghc_lib")
 
+# TODO[AH] Remove once ghc-lib-gen is fully Bazelified.
 GHC_LIB_REV = "d0b6ea3f84a1bedffc9957b5889351bd"
 GHC_LIB_SHA256 = "fa117b0f73f9f03cd796ea104d181be3bcb88e80b4470bf42abb6ada7e748ff2"
 GHC_LIB_VERSION = "8.8.1"
@@ -125,6 +127,9 @@ haskell_library(
         urls = ["https://github.com/digital-asset/daml-ghcide/archive/%s.tar.gz" % GHCIDE_REV],
     )
 
+    ghc_lib()
+
+    # TODO[AH] Remove once ghc-lib-gen is fully Bazelified.
     http_archive(
         name = "ghc_lib",
         build_file_content = """
@@ -146,6 +151,7 @@ haskell_cabal_library(
         urls = ["https://daml-binaries.da-ext.net/da-ghc-lib/ghc-lib-%s.tar.gz" % GHC_LIB_REV],
     )
 
+    # TODO[AH] Remove once ghc-lib-gen is fully Bazelified.
     http_archive(
         name = "ghc_lib_parser",
         build_file_content = """
