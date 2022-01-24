@@ -44,7 +44,7 @@ jobs:
     should_run: $[ dependencies.patch_bazel_pre_check.outputs['out.should_run'] ]
     bazel_base_version: 4.2.1
   pool:
-    vmImage: windows-2019
+    vmImage: windows-2022
   steps:
   - checkout: self
     condition: eq(variables.should_run, 'true')
