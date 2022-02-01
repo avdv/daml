@@ -77,23 +77,23 @@ let shared = rec {
   ghcWithLLVM = pkgs.runCommand "ghc-aarch64-symlinks" { buildInputs = [ pkgs.makeWrapper ]; } ''
       mkdir -p $out/bin
       for tool in \
-        ghc-8.10.7 \
+        ghc-9.0.2 \
         ghc-pkg \
-        ghc-pkg-8.10.7 \
+        ghc-pkg-9.0.2 \
         ghci \
-        ghci-8.10.7 \
+        ghci-9.0.2 \
         haddock \
         hp2ps \
         hpc \
         hsc2hs \
         runghc \
-        runghc-8.10.7 \
+        runghc-9.0.2 \
         runhaskell
       do
           ln -s ${ghc}/bin/$tool $out/bin/$tool
       done;
       mkdir -p $out/lib
-      ln -s ${ghc}/lib/ghc-8.10.7 $out/lib/ghc-8.10.7
+      ln -s ${ghc}/lib/ghc-9.0.2 $out/lib/ghc-9.0.2
       makeWrapper ${ghc}/bin/ghc $out/bin/ghc --prefix PATH : ${pkgs.llvmPackages_11.clang}/bin:${pkgs.llvmPackages_9.llvm}/bin
       '';
 
