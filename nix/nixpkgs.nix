@@ -36,6 +36,14 @@ let
       ];
       doInstallCheck = false;
     });
+    haskell = pkgs.haskell // {
+      compiler = pkgs.haskell.compiler // {
+        ghc902 = pkgs.haskell.compiler.ghc902.override(oldAttrs: {
+          buildTargetLlvmPackages = pkgs.llvmPackages_12;
+          llvmPackages = pkgs.llvmPackages_12;
+        });
+      };
+    };
   };
 
   nixpkgs = import src {
