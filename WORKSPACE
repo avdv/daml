@@ -427,6 +427,7 @@ haskell_register_ghc_nixpkgs(
     },
     cabalopts = [
         "--ghc-option=-v3",
+        "--ghc-option=-keep-tmp-files",
     ],
     locale_archive = "@glibc_locales//:locale-archive",
     nix_file = "//nix:bazel.nix",
