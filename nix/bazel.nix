@@ -85,8 +85,6 @@ let shared = rec {
         haddock \
         hp2ps \
         hpc \
-        hsc2hs \
-        runghc \
         runghc-9.0.2 \
         runhaskell
       do
@@ -95,6 +93,12 @@ let shared = rec {
       mkdir -p $out/lib
       ln -s ${ghc}/lib/ghc-9.0.2 $out/lib/ghc-9.0.2
       makeWrapper ${ghc}/bin/ghc $out/bin/ghc \
+        --set CODESIGN_ALLOCATE ${pkgs.darwin.cctools}/bin/codesign_allocate \
+        --prefix PATH : ${pkgs.llvmPackages_11.clang}/bin:${pkgs.llvmPackages_11.llvm}/bin
+      makeWrapper ${ghc}/bin/runghc $out/bin/runghc \
+        --set CODESIGN_ALLOCATE ${pkgs.darwin.cctools}/bin/codesign_allocate \
+        --prefix PATH : ${pkgs.llvmPackages_11.clang}/bin:${pkgs.llvmPackages_11.llvm}/bin
+      makeWrapper ${ghc}/bin/hsc2hs $out/bin/hsc2hs \
         --set CODESIGN_ALLOCATE ${pkgs.darwin.cctools}/bin/codesign_allocate \
         --prefix PATH : ${pkgs.llvmPackages_11.clang}/bin:${pkgs.llvmPackages_11.llvm}/bin
       '';
