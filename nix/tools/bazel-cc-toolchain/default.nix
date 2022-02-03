@@ -57,6 +57,7 @@ let
         --prefix PATH : $out/bin \
         --add-flags "-Wno-unused-command-line-argument \
                      -mmacosx-version-min=10.14 \
+                     -isystem ${llvmPackages_12.libcxx}/include/c++/v1 \
                      -F${CoreFoundation}/Library/Frameworks \
                      -F${CoreServices}/Library/Frameworks \
                      -F${Security}/Library/Frameworks \
