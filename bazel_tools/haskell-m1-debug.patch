@@ -1,5 +1,5 @@
 diff --git a/haskell/private/cabal_wrapper.py b/haskell/private/cabal_wrapper.py
-index 6dd634e1..191cff26 100755
+index 6dd634e1..df540b65 100755
 --- a/haskell/private/cabal_wrapper.py
 +++ b/haskell/private/cabal_wrapper.py
 @@ -49,8 +49,8 @@ import sys
@@ -13,7 +13,7 @@ index 6dd634e1..191cff26 100755
  with open(sys.argv.pop(1)) as json_file:
      json_args = json.load(json_file)
  
-@@ -249,7 +249,7 @@ with mkdtemp(distdir_prefix()) as distdir:
+@@ -249,13 +249,14 @@ with mkdtemp(distdir_prefix()) as distdir:
      runghc_args = [arg.replace("./", execroot + "/") for arg in runghc_args]
      run([runghc] + runghc_args + [setup, "configure", \
          component, \
@@ -22,7 +22,14 @@ index 6dd634e1..191cff26 100755
          "--user", \
          "--with-compiler=" + ghc,
          "--with-hc-pkg=" + ghc_pkg,
-@@ -286,16 +286,16 @@ with mkdtemp(distdir_prefix()) as distdir:
+         "--with-hsc2hs=" + hsc2hs,
+         "--with-ar=" + ar,
+         "--with-gcc=" + cc,
++        "--with-ld=" + cc,
+         "--with-strip=" + strip,
+         "--enable-deterministic", \
+         ] +
+@@ -286,16 +287,16 @@ with mkdtemp(distdir_prefix()) as distdir:
          [ arg.replace("=", "=" + execroot + "/") for arg in path_args ] + \
          [ "--package-db=" + package_database ], # This arg must come last.
          )
