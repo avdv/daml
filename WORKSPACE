@@ -427,6 +427,9 @@ haskell_register_ghc_nixpkgs(
         "@com_github_digital_asset_daml//:profiling_build": ["-fprof-auto"],
         "//conditions:default": [],
     },
+    cabalopts = [
+        "--ghc-option=-v3",
+    ],
     locale_archive = "@glibc_locales//:locale-archive",
     nix_file = "//nix:bazel.nix",
     nix_file_deps = common_nix_file_deps,
