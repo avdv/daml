@@ -94,7 +94,9 @@ let shared = rec {
       done;
       mkdir -p $out/lib
       ln -s ${ghc}/lib/ghc-9.0.2 $out/lib/ghc-9.0.2
-      makeWrapper ${ghc}/bin/ghc $out/bin/ghc --prefix PATH : ${pkgs.llvmPackages_11.clang}/bin:${pkgs.llvmPackages_11.llvm}/bin:${pkgs.darwin.cctools}/bin
+      makeWrapper ${ghc}/bin/ghc $out/bin/ghc \
+        --set CODESIGN_ALLOCATE ${pkgs.darwin.cctools}/bin/codesign_allocate \
+        --prefix PATH : ${pkgs.llvmPackages_11.clang}/bin:${pkgs.llvmPackages_11.llvm}/bin
       '';
 
   # Deliberately not taken from ghcPkgs. This is a fully
