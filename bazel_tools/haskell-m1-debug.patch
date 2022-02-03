@@ -1,5 +1,17 @@
+diff --git a/haskell/cabal.bzl b/haskell/cabal.bzl
+index 6f606be3..77f8c8bd 100644
+--- a/haskell/cabal.bzl
++++ b/haskell/cabal.bzl
+@@ -172,6 +172,7 @@ def _cabal_toolchain_info(hs, cc, workspace_name, runghc):
+         runghc = runghc.path,
+         ar = ar,
+         cc = cc.tools.cc,
++        ld = cc.tools.ld,
+         strip = cc.tools.strip,
+         is_windows = hs.toolchain.is_windows,
+         workspace = workspace_name,
 diff --git a/haskell/private/cabal_wrapper.py b/haskell/private/cabal_wrapper.py
-index 6dd634e1..df540b65 100755
+index 6dd634e1..bc30850e 100755
 --- a/haskell/private/cabal_wrapper.py
 +++ b/haskell/private/cabal_wrapper.py
 @@ -49,8 +49,8 @@ import sys
@@ -13,7 +25,15 @@ index 6dd634e1..df540b65 100755
  with open(sys.argv.pop(1)) as json_file:
      json_args = json.load(json_file)
  
-@@ -249,13 +249,14 @@ with mkdtemp(distdir_prefix()) as distdir:
+@@ -128,6 +128,7 @@ path_args = json_args["path_args"]
+ 
+ ar = find_exe(toolchain_info["ar"])
+ cc = find_exe(toolchain_info["cc"])
++ld = find_exe(toolchain_info["ld"])
+ strip = find_exe(toolchain_info["strip"])
+ 
+ def recache_db():
+@@ -249,13 +250,14 @@ with mkdtemp(distdir_prefix()) as distdir:
      runghc_args = [arg.replace("./", execroot + "/") for arg in runghc_args]
      run([runghc] + runghc_args + [setup, "configure", \
          component, \
@@ -25,11 +45,11 @@ index 6dd634e1..df540b65 100755
          "--with-hsc2hs=" + hsc2hs,
          "--with-ar=" + ar,
          "--with-gcc=" + cc,
-+        "--with-ld=" + cc,
++        "--with-ld=" + ld,
          "--with-strip=" + strip,
          "--enable-deterministic", \
          ] +
-@@ -286,16 +287,16 @@ with mkdtemp(distdir_prefix()) as distdir:
+@@ -286,16 +288,16 @@ with mkdtemp(distdir_prefix()) as distdir:
          [ arg.replace("=", "=" + execroot + "/") for arg in path_args ] + \
          [ "--package-db=" + package_database ], # This arg must come last.
          )
