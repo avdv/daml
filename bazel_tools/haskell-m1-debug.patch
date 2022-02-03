@@ -56,7 +56,7 @@ index 1cd3f675..f7a2200a 100644
      doctest_log = ctx.actions.declare_file(
          "doctest-log-" + ctx.label.name + "-" + target.label.name,
 diff --git a/haskell/private/cabal_wrapper.py b/haskell/private/cabal_wrapper.py
-index 6dd634e1..bc30850e 100755
+index 6dd634e1..94357424 100755
 --- a/haskell/private/cabal_wrapper.py
 +++ b/haskell/private/cabal_wrapper.py
 @@ -49,8 +49,8 @@ import sys
@@ -78,7 +78,17 @@ index 6dd634e1..bc30850e 100755
  strip = find_exe(toolchain_info["strip"])
  
  def recache_db():
-@@ -249,13 +250,14 @@ with mkdtemp(distdir_prefix()) as distdir:
+@@ -156,7 +157,8 @@ def mkdtemp(prefix):
+     try:
+         yield dirname
+     finally:
+-        shutil.rmtree(dirname, ignore_errors = True)
++        pass
++        #shutil.rmtree(dirname, ignore_errors = True)
+ 
+ def distdir_prefix():
+     # Build into a sibling path of the final binary output location.
+@@ -249,13 +251,14 @@ with mkdtemp(distdir_prefix()) as distdir:
      runghc_args = [arg.replace("./", execroot + "/") for arg in runghc_args]
      run([runghc] + runghc_args + [setup, "configure", \
          component, \
@@ -94,7 +104,7 @@ index 6dd634e1..bc30850e 100755
          "--with-strip=" + strip,
          "--enable-deterministic", \
          ] +
-@@ -286,16 +288,16 @@ with mkdtemp(distdir_prefix()) as distdir:
+@@ -286,17 +289,17 @@ with mkdtemp(distdir_prefix()) as distdir:
          [ arg.replace("=", "=" + execroot + "/") for arg in path_args ] + \
          [ "--package-db=" + package_database ], # This arg must come last.
          )
@@ -111,10 +121,12 @@ index 6dd634e1..bc30850e 100755
      # then these modified files will enter `srcs` on the next execution and
      # invalidate the cache. To avoid this we remove generated files.
 -    run([runghc] + runghc_args + [setup, "clean", "--verbose=0", "--builddir=" + distdir])
-+    run([runghc] + runghc_args + [setup, "clean", "--verbose=3", "--builddir=" + distdir])
-     if generated_paths_file: os.remove(generated_paths_file)
+-    if generated_paths_file: os.remove(generated_paths_file)
++    #run([runghc] + runghc_args + [setup, "clean", "--verbose=3", "--builddir=" + distdir])
++    #if generated_paths_file: os.remove(generated_paths_file)
      os.chdir(old_cwd)
  
+ # XXX Cabal has a bizarre layout that we can't control directly. It
 diff --git a/haskell/private/cc_wrapper.py.tpl b/haskell/private/cc_wrapper.py.tpl
 index 311c0f96..0e416ae3 100644
 --- a/haskell/private/cc_wrapper.py.tpl
