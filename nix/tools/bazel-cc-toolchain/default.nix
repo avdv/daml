@@ -50,7 +50,7 @@ let mycc = stdenv.cc.override {
     rm $out/bin/cc $out/bin/clang $out/bin/clang++
 
     makeWrapper ${mycc}/bin/cc $out/bin/cc \
-      --prefix PATH : $out/bin \
+      --prefix PATH : ${darwin.cctools}/bin:$out/bin \
       --add-flags "-Wno-unused-command-line-argument \
                    -mmacosx-version-min=10.14 \
                    -isystem ${llvmPackages_7.libcxx}/include/c++/v1 \
