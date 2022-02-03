@@ -1,0 +1,45 @@
+diff --git a/haskell/private/cabal_wrapper.py b/haskell/private/cabal_wrapper.py
+index 6dd634e1..191cff26 100755
+--- a/haskell/private/cabal_wrapper.py
++++ b/haskell/private/cabal_wrapper.py
+@@ -49,8 +49,8 @@ import sys
+ import tempfile
+ from generate_cabal_paths_module import generate_cabal_paths_module
+ 
+-debug = False
+-verbose = os.environ.get("CABAL_VERBOSE", "") == "True"
++debug = True
++verbose = True
+ with open(sys.argv.pop(1)) as json_file:
+     json_args = json.load(json_file)
+ 
+@@ -249,7 +249,7 @@ with mkdtemp(distdir_prefix()) as distdir:
+     runghc_args = [arg.replace("./", execroot + "/") for arg in runghc_args]
+     run([runghc] + runghc_args + [setup, "configure", \
+         component, \
+-        "--verbose=0", \
++        "--verbose=3", \
+         "--user", \
+         "--with-compiler=" + ghc,
+         "--with-hc-pkg=" + ghc_pkg,
+@@ -286,16 +286,16 @@ with mkdtemp(distdir_prefix()) as distdir:
+         [ arg.replace("=", "=" + execroot + "/") for arg in path_args ] + \
+         [ "--package-db=" + package_database ], # This arg must come last.
+         )
+-    run([runghc] + runghc_args + [setup, "build", "--verbose=0", "--builddir=" + distdir])
++    run([runghc] + runghc_args + [setup, "build", "--verbose=3", "--builddir=" + distdir])
+     if haddock:
+-        run([runghc] + runghc_args + [setup, "haddock", "--verbose=0", "--builddir=" + distdir])
+-    run([runghc] + runghc_args + [setup, "install", "--verbose=0", "--builddir=" + distdir])
++        run([runghc] + runghc_args + [setup, "haddock", "--verbose=3", "--builddir=" + distdir])
++    run([runghc] + runghc_args + [setup, "install", "--verbose=3", "--builddir=" + distdir])
+     # Bazel builds are not sandboxed on Windows and can be non-sandboxed on
+     # other OSs. Operations like executing `configure` scripts can modify the
+     # source tree. If the `srcs` attribute uses a glob like `glob(["**"])`,
+     # then these modified files will enter `srcs` on the next execution and
+     # invalidate the cache. To avoid this we remove generated files.
+-    run([runghc] + runghc_args + [setup, "clean", "--verbose=0", "--builddir=" + distdir])
++    run([runghc] + runghc_args + [setup, "clean", "--verbose=3", "--builddir=" + distdir])
+     if generated_paths_file: os.remove(generated_paths_file)
+     os.chdir(old_cwd)
+ 
