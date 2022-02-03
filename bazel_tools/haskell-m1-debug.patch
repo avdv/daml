@@ -71,10 +71,10 @@ index 6dd634e1..bc30850e 100755
      os.chdir(old_cwd)
  
 diff --git a/haskell/private/cc_wrapper.py.tpl b/haskell/private/cc_wrapper.py.tpl
-index 311c0f96..a2637c2e 100644
+index 311c0f96..86090ab9 100644
 --- a/haskell/private/cc_wrapper.py.tpl
 +++ b/haskell/private/cc_wrapper.py.tpl
-@@ -86,15 +86,24 @@ CPU = os.environ.get("CC_WRAPPER_CPU", "{:cpu:}")
+@@ -86,15 +86,27 @@ CPU = os.environ.get("CC_WRAPPER_CPU", "{:cpu:}")
  INSTALL_NAME_TOOL = "/usr/bin/install_name_tool"
  OTOOL = "/usr/bin/otool"
  
@@ -87,15 +87,18 @@ index 311c0f96..a2637c2e 100644
 +    debug(60*"=")
      parsed = Args(load_response_files(sys.argv[1:]))
  
-+    debug("ENV", os.environ)
++    debug("ENV\n" + "\n".join(f"  {k}: {v}" for k, v in os.environ.items()))
      if parsed.linking:
-+        debug("LINK", parsed.output, parsed.libraries, parsed.rpaths, parsed.args)
++        debug("LINK", parsed.output)
++        debug("  LIBRARIES\n" + "\n".join(f"    {v}" for v in parsed.libraries))
++        debug("  RPATHS\n" + "\n".join(f"    {v}" for v in parsed.rpaths))
++        debug("  ARGS\n" + "\n".join(f"    {v}" for v in parsed.args))
          link(parsed.output, parsed.libraries, parsed.rpaths, parsed.args)
      elif parsed.printing_file_name:
-+        debug("PRINT_FILE_NAME", parsed.print_file_name, parsed.args)
++        debug("PRINT_FILE_NAME " + parsed.print_file_name + "\n" + "\n".join(f"  {v}" for v in parsed.args))
          print_file_name(parsed.print_file_name, parsed.args)
      else:
-+        debug("CC", parsed.args)
++        debug("CC\n" + "\n".join(f"  {v}" for v in parsed.args))
          run_cc(parsed.args, exit_on_error=True)
  
  
