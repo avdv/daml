@@ -71,7 +71,7 @@ index 6dd634e1..bc30850e 100755
      os.chdir(old_cwd)
  
 diff --git a/haskell/private/cc_wrapper.py.tpl b/haskell/private/cc_wrapper.py.tpl
-index 311c0f96..443687e4 100644
+index 311c0f96..0e416ae3 100644
 --- a/haskell/private/cc_wrapper.py.tpl
 +++ b/haskell/private/cc_wrapper.py.tpl
 @@ -86,15 +86,27 @@ CPU = os.environ.get("CC_WRAPPER_CPU", "{:cpu:}")
@@ -112,7 +112,7 @@ index 311c0f96..443687e4 100644
          # The capture_output argument to subprocess.run was only added in 3.7.
          new_kwargs = dict(stdout=subprocess.PIPE, stderr=subprocess.PIPE)
          new_kwargs.update(kwargs)
-@@ -1055,14 +1068,27 @@ def run_cc(args, capture_output=False, exit_on_error=False, **kwargs):
+@@ -1055,14 +1068,28 @@ def run_cc(args, capture_output=False, exit_on_error=False, **kwargs):
          # subprocess.Popen does not support context manager on CI setup.
          proc = subprocess.Popen([cc] + args, **kwargs)
  
@@ -130,6 +130,7 @@ index 311c0f96..443687e4 100644
          returncode = proc.wait()
  
 +        debug("RUN\n  " + cc + " " + " ".join(args))
++        debug("RETURNCODE", returncode)
 +        debug("STDOUT")
 +        debug(stdoutbuf.decode(errors = "replace"))
 +        debug("STDERR")
