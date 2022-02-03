@@ -27,14 +27,14 @@ let
       '';
     };
   darwinBinutils = darwin.binutils.override { inherit postLinkSignHook; };
-  mycc =
-    stdenv.cc.override {
-      bintools = bintools.override { inherit postLinkSignHook; };
-    };
   cc-darwin =
     with darwin.apple_sdk.frameworks;
     let
       stdenv = llvmPackages_12.stdenv;
+      mycc =
+        stdenv.cc.override {
+          bintools = bintools.override { inherit postLinkSignHook; };
+        };
     in
     runCommand "cc-wrapper-bazel"
     {
