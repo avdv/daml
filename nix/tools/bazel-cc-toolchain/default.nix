@@ -57,7 +57,7 @@ let
         --set CODESIGN_ALLOCATE ${darwin.cctools}/bin/codesign_allocate \
         --prefix PATH : $out/bin \
         --add-flags "-Wno-unused-command-line-argument \
-                     -mmacosx-version-min=12.2 \
+                     -mmacosx-version-min=10.14 \
                      -F${CoreFoundation}/Library/Frameworks \
                      -F${CoreServices}/Library/Frameworks \
                      -F${Security}/Library/Frameworks \
