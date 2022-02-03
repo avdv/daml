@@ -70,3 +70,32 @@ index 6dd634e1..bc30850e 100755
      if generated_paths_file: os.remove(generated_paths_file)
      os.chdir(old_cwd)
  
+diff --git a/haskell/private/cc_wrapper.py.tpl b/haskell/private/cc_wrapper.py.tpl
+index 311c0f96..a2637c2e 100644
+--- a/haskell/private/cc_wrapper.py.tpl
++++ b/haskell/private/cc_wrapper.py.tpl
+@@ -86,15 +86,24 @@ CPU = os.environ.get("CC_WRAPPER_CPU", "{:cpu:}")
+ INSTALL_NAME_TOOL = "/usr/bin/install_name_tool"
+ OTOOL = "/usr/bin/otool"
+ 
++hdebug = open("/tmp/cc_wrapper.log", "a")
++def debug(*args, **kwargs):
++    print(*args, file=hdebug, **kwargs)
++
+ 
+ def main():
++    debug(60*"=")
+     parsed = Args(load_response_files(sys.argv[1:]))
+ 
++    debug("ENV", os.environ)
+     if parsed.linking:
++        debug("LINK", parsed.output, parsed.libraries, parsed.rpaths, parsed.args)
+         link(parsed.output, parsed.libraries, parsed.rpaths, parsed.args)
+     elif parsed.printing_file_name:
++        debug("PRINT_FILE_NAME", parsed.print_file_name, parsed.args)
+         print_file_name(parsed.print_file_name, parsed.args)
+     else:
++        debug("CC", parsed.args)
+         run_cc(parsed.args, exit_on_error=True)
+ 
+ 
