@@ -16,19 +16,20 @@
 # https://github.com/NixOS/nixpkgs/issues/42059. See also
 # https://github.com/NixOS/nixpkgs/pull/41589.
 let
+  postLinkSignHook =
+    writeTextFile {
+      name = "post-link-sign-hook";
+      executable = true;
+
+      text = ''
+        CODESIGN_ALLOCATE=${darwin.cctools}/bin/codesign_allocate \
+          ${sigtool}/bin/codesign -f -s - "$linkerOutput"
+      '';
+    };
+  darwinBinutils = darwin.binutils.override { inherit postLinkSignHook; };
   mycc =
     stdenv.cc.override {
-      bintools = bintools.override {
-        postLinkSignHook = writeTextFile {
-          name = "post-link-sign-hook";
-          executable = true;
-
-          text = ''
-            CODESIGN_ALLOCATE=${darwin.cctools}/bin/codesign_allocate \
-              ${sigtool}/bin/codesign -f -s - "$linkerOutput"
-          '';
-        };
-      };
+      bintools = bintools.override { inherit postLinkSignHook; };
     };
   cc-darwin =
     with darwin.apple_sdk.frameworks;
@@ -94,5 +95,5 @@ let
 in
 buildEnv {
   name = "bazel-cc-toolchain";
-  paths = [ customStdenv.cc ] ++ (if stdenv.isDarwin then [ darwin.binutils ] else [ binutils ]);
+  paths = [ customStdenv.cc ] ++ (if stdenv.isDarwin then [ darwinBinutils ] else [ binutils ]);
 }
