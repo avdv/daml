@@ -3,7 +3,7 @@
 , bintools
 , buildEnv
 , darwin
-, llvmPackages_11
+, llvmPackages_12
 , makeWrapper
 , overrideCC
 , runCommand
@@ -34,7 +34,7 @@ let
   cc-darwin =
     with darwin.apple_sdk.frameworks;
     let
-      stdenv = llvmPackages_11.stdenv;
+      stdenv = llvmPackages_12.stdenv;
     in
     runCommand "cc-wrapper-bazel"
     {
@@ -61,7 +61,7 @@ let
                      -F${CoreServices}/Library/Frameworks \
                      -F${Security}/Library/Frameworks \
                      -F${Foundation}/Library/Frameworks \
-                     -L${llvmPackages_11.libcxx}/lib \
+                     -L${llvmPackages_12.libcxx}/lib \
                      -L${darwin.libobjc}/lib"
     '';
 
