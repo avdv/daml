@@ -1,8 +1,8 @@
 diff --git a/haskell/cabal.bzl b/haskell/cabal.bzl
-index 6f606be3..77f8c8bd 100644
+index 6f606be3..7bbe6dbf 100644
 --- a/haskell/cabal.bzl
 +++ b/haskell/cabal.bzl
-@@ -172,6 +172,7 @@ def _cabal_toolchain_info(hs, cc, workspace_name, runghc):
+@@ -172,10 +172,11 @@ def _cabal_toolchain_info(hs, cc, workspace_name, runghc):
          runghc = runghc.path,
          ar = ar,
          cc = cc.tools.cc,
@@ -10,6 +10,51 @@ index 6f606be3..77f8c8bd 100644
          strip = cc.tools.strip,
          is_windows = hs.toolchain.is_windows,
          workspace = workspace_name,
+-        ghc_cc_args = ghc_cc_program_args(hs, "$CC"),
++        ghc_cc_args = ghc_cc_program_args(hs, "$CC", cc.tools.ld),
+     )
+ 
+ def _prepare_cabal_inputs(
+diff --git a/haskell/cc.bzl b/haskell/cc.bzl
+index 3726133c..f1ac22d6 100644
+--- a/haskell/cc.bzl
++++ b/haskell/cc.bzl
+@@ -186,11 +186,12 @@ def cc_interop_info(ctx, override_cc_toolchain = None):
+         ]).linking_context.linker_inputs.to_list() for lib in li.libraries],
+     )
+ 
+-def ghc_cc_program_args(hs, cc):
++def ghc_cc_program_args(hs, cc, ld):
+     """Returns the -pgm* flags required to override cc.
+ 
+     Args:
+       cc: string, path to the C compiler (cc_wrapper).
++      ld: string, path to the linker (ld).
+ 
+     Returns:
+       list of string, GHC arguments.
+@@ -203,6 +204,8 @@ def ghc_cc_program_args(hs, cc):
+         cc,
+         "-pgml",
+         cc,
++        "-pgmlm",
++        ld,
+         # Setting -pgm* flags explicitly has the unfortunate side effect
+         # of resetting any program flags in the GHC settings file. So we
+         # restore them here. See
+diff --git a/haskell/doctest.bzl b/haskell/doctest.bzl
+index 1cd3f675..f7a2200a 100644
+--- a/haskell/doctest.bzl
++++ b/haskell/doctest.bzl
+@@ -98,7 +98,7 @@ def _haskell_doctest_single(target, ctx):
+         ctx,
+         override_cc_toolchain = hs.tools_config.maybe_exec_cc_toolchain,
+     )
+-    args.add_all(ghc_cc_program_args(hs, cc.tools.cc))
++    args.add_all(ghc_cc_program_args(hs, cc.tools.cc, cc.tools.ld))
+ 
+     doctest_log = ctx.actions.declare_file(
+         "doctest-log-" + ctx.label.name + "-" + target.label.name,
 diff --git a/haskell/private/cabal_wrapper.py b/haskell/private/cabal_wrapper.py
 index 6dd634e1..bc30850e 100755
 --- a/haskell/private/cabal_wrapper.py
@@ -145,3 +190,38 @@ index 311c0f96..0e416ae3 100644
          if exit_on_error and returncode != 0:
              if capture_output:
                  sys.stdout.buffer.write(stdoutbuf)
+diff --git a/haskell/repl.bzl b/haskell/repl.bzl
+index 6cc44499..ab001cd6 100644
+--- a/haskell/repl.bzl
++++ b/haskell/repl.bzl
+@@ -396,7 +396,7 @@ def _create_repl(hs, cc, posix, ctx, repl_info, output):
+         "$RULES_HASKELL_EXEC_ROOT",
+         hs.toolchain.cc_wrapper.executable.path,
+     )
+-    args.extend(['"{}"'.format(arg) for arg in ghc_cc_program_args(hs, cc_path)])
++    args.extend(['"{}"'.format(arg) for arg in ghc_cc_program_args(hs, cc_path, cc.tools.ld)])
+ 
+     # Load source files
+     # Force loading by source with `:add *...`.
+@@ -518,7 +518,7 @@ def _create_hie_bios(hs, cc, posix, ctx, repl_info, path_prefix):
+     path_prefix = paths.join("", *path_prefix)
+     args, inputs = _compiler_flags_and_inputs(hs, cc, repl_info, path_prefix = path_prefix, static = True)
+     cc_path = paths.join(path_prefix, hs.toolchain.cc_wrapper.executable.path)
+-    args.extend(ghc_cc_program_args(hs, cc_path))
++    args.extend(ghc_cc_program_args(hs, cc_path, cc.tools.ld))
+     args.extend(hs.toolchain.ghcopts)
+     args.extend(repl_info.load_info.compiler_flags)
+ 
+diff --git a/haskell/toolchain.bzl b/haskell/toolchain.bzl
+index 2cecc0b8..74f72163 100644
+--- a/haskell/toolchain.bzl
++++ b/haskell/toolchain.bzl
+@@ -46,7 +46,7 @@ def _run_ghc(hs, cc, inputs, outputs, mnemonic, arguments, env, params_file = No
+ 
+     # XXX: We should also tether Bazel's CC toolchain to GHC's, so that we can properly mix Bazel-compiled
+     # C libraries with Haskell targets.
+-    args.add_all(ghc_cc_program_args(hs, cc.tools.cc))
++    args.add_all(ghc_cc_program_args(hs, cc.tools.cc, cc.tools.ld))
+ 
+     compile_flags_file = hs.actions.declare_file("compile_flags_%s_%s_%s" % (hs.name, extra_name, mnemonic))
+     extra_args_file = hs.actions.declare_file("extra_args_%s_%s_%s" % (hs.name, extra_name, mnemonic))
