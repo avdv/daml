@@ -3,7 +3,7 @@
 , bintools
 , buildEnv
 , darwin
-, llvmPackages_7
+, llvmPackages_11
 , makeWrapper
 , overrideCC
 , runCommand
@@ -33,9 +33,8 @@ let
     };
   cc-darwin =
     with darwin.apple_sdk.frameworks;
-    # Note (MK): For now we pin to clang 7 since newer versions fail to build abseil.
     let
-      stdenv = llvmPackages_7.stdenv;
+      stdenv = llvmPackages_11.stdenv;
     in
     runCommand "cc-wrapper-bazel"
     {
@@ -62,7 +61,7 @@ let
                      -F${CoreServices}/Library/Frameworks \
                      -F${Security}/Library/Frameworks \
                      -F${Foundation}/Library/Frameworks \
-                     -L${llvmPackages_7.libcxx}/lib \
+                     -L${llvmPackages_11.libcxx}/lib \
                      -L${darwin.libobjc}/lib"
     '';
 
