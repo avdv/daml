@@ -29,43 +29,21 @@ let
     };
   darwinBinutils = darwin.binutils.override { inherit postLinkSignHook; };
   cc-darwin =
-    with darwin.apple_sdk.frameworks;
-    let
-      stdenv = llvmPackages_12.stdenv;
-      mycc =
-        stdenv.cc.override {
-          bintools = bintools.override { inherit postLinkSignHook; };
-        };
-    in
-    runCommand "cc-wrapper-bazel"
-    {
-      buildInputs = [ mycc makeWrapper ];
-    }
-    ''
-      mkdir -p $out/bin
-
-      # Copy the content of pkgs.stdenv.cc
-      for i in ${mycc}/bin/*
-      do
-        ln -sf $i $out/bin
-      done
-
-      # Override cc
-      rm $out/bin/cc $out/bin/clang $out/bin/clang++
-
-      makeWrapper ${mycc}/bin/cc $out/bin/cc \
-        --set CODESIGN_ALLOCATE ${darwin.cctools}/bin/codesign_allocate \
-        --prefix PATH : $out/bin \
-        --add-flags "-Wno-unused-command-line-argument \
-                     -mmacosx-version-min=10.14 \
-                     -isystem ${llvmPackages_12.libcxx}/include/c++/v1 \
-                     -F${CoreFoundation}/Library/Frameworks \
-                     -F${CoreServices}/Library/Frameworks \
-                     -F${Security}/Library/Frameworks \
-                     -F${Foundation}/Library/Frameworks \
-                     -L${llvmPackages_12.libcxx}/lib \
-                     -L${darwin.libobjc}/lib"
-    '';
+    wrapCCWith {
+      cc = llvmPackages_12.clang;
+      bintools = darwinBinutils;
+      extraBuildCommands = with darwin.apple_sdk.frameworks; ''
+        echo "-Wno-unused-command-line-argument" >> $out/nix-support/cc-cflags
+        echo "-mmacosx-version-min=10.14" >> $out/nix-support/cc-cflags
+        echo "-isystem ${llvmPackages_12.libcxx}/include/c++/v1" >> $out/nix-support/cc-cflags
+        echo "-F${CoreFoundation}/Library/Frameworks" >> $out/nix-support/cc-cflags
+        echo "-F${CoreServices}/Library/Frameworks" >> $out/nix-support/cc-cflags
+        echo "-F${Security}/Library/Frameworks" >> $out/nix-support/cc-cflags
+        echo "-F${Foundation}/Library/Frameworks" >> $out/nix-support/cc-cflags
+        echo "-L${llvmPackages_12.libcxx}/lib" >> $out/nix-support/cc-cflags
+        echo "-L${darwin.libobjc}/lib" >> $out/nix-support/cc-cflags
+      '';
+    };
 
   cc-linux =
     wrapCCWith {
