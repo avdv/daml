@@ -1,4 +1,4 @@
-module LibA (double) where
+module Lib (double) where
 
 #include "clib.h"
 

@@ -19,8 +19,19 @@ cc_library(
 )
 
 da_haskell_library(
-    name = "haskell-library",
+    name = "hsclib",
     srcs = ["Lib.hsc"],
+    hackage_deps = [
+        "base",
+    ],
+    deps = [
+        ":libclib",
+    ],
+)
+
+da_haskell_library(
+    name = "hslib",
+    srcs = ["Lib.hs"],
     hackage_deps = [
         "base",
     ],
