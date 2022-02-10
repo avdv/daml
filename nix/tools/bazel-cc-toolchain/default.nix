@@ -35,7 +35,7 @@ let
       extraBuildCommands = with darwin.apple_sdk.frameworks; ''
         echo "-Wno-unused-command-line-argument" >> $out/nix-support/cc-cflags
         echo "-mmacosx-version-min=10.14" >> $out/nix-support/cc-cflags
-        echo "-isystem ${llvmPackages_12.libcxx}/include/c++/v1" >> $out/nix-support/cc-cflags
+        echo "-isystem ${llvmPackages_12.libcxx.dev}/include/c++/v1" >> $out/nix-support/cc-cflags
         echo "-F${CoreFoundation}/Library/Frameworks" >> $out/nix-support/cc-cflags
         echo "-F${CoreServices}/Library/Frameworks" >> $out/nix-support/cc-cflags
         echo "-F${Security}/Library/Frameworks" >> $out/nix-support/cc-cflags
