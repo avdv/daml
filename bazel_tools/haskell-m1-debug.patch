@@ -128,7 +128,7 @@ index 6dd634e1..94357424 100755
  
  # XXX Cabal has a bizarre layout that we can't control directly. It
 diff --git a/haskell/private/cc_wrapper.py.tpl b/haskell/private/cc_wrapper.py.tpl
-index 311c0f96..bfb17cdd 100644
+index 311c0f96..184e8637 100644
 --- a/haskell/private/cc_wrapper.py.tpl
 +++ b/haskell/private/cc_wrapper.py.tpl
 @@ -86,15 +86,27 @@ CPU = os.environ.get("CC_WRAPPER_CPU", "{:cpu:}")
@@ -159,18 +159,7 @@ index 311c0f96..bfb17cdd 100644
          run_cc(parsed.args, exit_on_error=True)
  
  
-@@ -582,7 +594,9 @@ def link(output, libraries, rpaths, args):
-         rpaths = shorten_rpaths(rpaths, libraries, output)
- 
-     args.extend(rpath_args(rpaths))
--    run_cc(args, exit_on_error=True)
-+    environ = os.environ.copy()
-+    environ["NIX_DEBUG"] = "1"
-+    run_cc(args, exit_on_error=True, env=environ)
- 
-     if is_darwin():
-         darwin_rewrite_load_commands(darwin_rewrites, output)
-@@ -1042,7 +1056,8 @@ def run_cc(args, capture_output=False, exit_on_error=False, **kwargs):
+@@ -1042,7 +1054,8 @@ def run_cc(args, capture_output=False, exit_on_error=False, **kwargs):
          stderrbuf: The captured standard error, None if not capture_output.
  
      """
@@ -180,9 +169,16 @@ index 311c0f96..bfb17cdd 100644
          # The capture_output argument to subprocess.run was only added in 3.7.
          new_kwargs = dict(stdout=subprocess.PIPE, stderr=subprocess.PIPE)
          new_kwargs.update(kwargs)
-@@ -1055,14 +1070,28 @@ def run_cc(args, capture_output=False, exit_on_error=False, **kwargs):
+@@ -1051,18 +1064,34 @@ def run_cc(args, capture_output=False, exit_on_error=False, **kwargs):
+     cc = find_cc()
+ 
+     def _run_cc(args):
++        environ = os.environ.copy()
++        environ["NIX_DEBUG"] = "1"
+         # subprocess.run is not supported in the bindist CI setup.
          # subprocess.Popen does not support context manager on CI setup.
-         proc = subprocess.Popen([cc] + args, **kwargs)
+-        proc = subprocess.Popen([cc] + args, **kwargs)
++        proc = subprocess.Popen([cc] + args, env=environ, **kwargs)
  
 -        if capture_output:
 +        #if capture_output:
