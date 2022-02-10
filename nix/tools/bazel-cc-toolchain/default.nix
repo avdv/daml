@@ -29,13 +29,14 @@ let
     };
   darwinBinutils = darwin.binutils.override { inherit postLinkSignHook; };
   cc-darwin =
-    wrapCCWith {
+    wrapCCWith rec {
       cc = llvmPackages_12.clang;
       bintools = darwinBinutils;
       extraBuildCommands = with darwin.apple_sdk.frameworks; ''
         echo "-Wno-unused-command-line-argument" >> $out/nix-support/cc-cflags
         echo "-mmacosx-version-min=10.14" >> $out/nix-support/cc-cflags
         echo "-isystem ${llvmPackages_12.libcxx.dev}/include/c++/v1" >> $out/nix-support/cc-cflags
+        echo "-isystem ${cc}/lib/clang/${cc.version}/include" >> $out/nix-support/cc-cflags
         echo "-F${CoreFoundation}/Library/Frameworks" >> $out/nix-support/cc-cflags
         echo "-F${CoreServices}/Library/Frameworks" >> $out/nix-support/cc-cflags
         echo "-F${Security}/Library/Frameworks" >> $out/nix-support/cc-cflags
