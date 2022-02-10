@@ -5,6 +5,7 @@
 , darwin
 , llvmPackages_12
 , makeWrapper
+, wrapCCWith
 , overrideCC
 , runCommand
 , writeTextFile
@@ -67,26 +68,12 @@ let
     '';
 
   cc-linux =
-    runCommand "cc-wrapper-bazel" {
-      buildInputs = [ makeWrapper ];
-    }
-    ''
-      mkdir -p $out/bin
-
-      # Copy the content of pkgs.stdenv.cc
-      for i in ${stdenv.cc}/bin/*
-      do
-        ln -sf $i $out/bin
-      done
-
-      # Override gcc
-      rm $out/bin/cc $out/bin/gcc $out/bin/g++
-
-      # We disable the fortify hardening as it causes issues with some
-      # packages built with bazel that set these flags themselves.
-      makeWrapper ${stdenv.cc}/bin/cc $out/bin/cc \
-        --set hardeningDisable fortify
-    '';
+    wrapCCWith {
+      cc = stdenv.cc.overrideAttrs (oldAttrs: {
+        hardeningUnsupportedFlags =
+          ["fortify"] ++ oldAttrs.hardeningUnsupportedFlags or [];
+      });
+    };
 
   customStdenv =
     if stdenv.isDarwin
@@ -96,4 +83,5 @@ in
 buildEnv {
   name = "bazel-cc-toolchain";
   paths = [ customStdenv.cc ] ++ (if stdenv.isDarwin then [ darwinBinutils ] else [ binutils ]);
+  ignoreCollisions = true;
 }
