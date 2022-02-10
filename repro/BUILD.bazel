@@ -1,0 +1,30 @@
+# Copyright (c) 2022 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+load("//bazel_tools:haskell.bzl", "da_haskell_library", "da_haskell_test")
+
+cc_library(
+    name = "clib",
+    srcs = ["add.c"],
+    hdrs = ["clib.h"],
+    includes = ["."],
+)
+
+cc_library(
+    name = "libclib",
+    srcs = [":clib"],
+    hdrs = ["clib.h"],
+    includes = ["."],
+    linkstatic = True,
+)
+
+da_haskell_library(
+    name = "haskell-library",
+    srcs = ["Lib.hsc"],
+    hackage_deps = [
+        "base",
+    ],
+    deps = [
+        ":libclib",
+    ],
+)
