@@ -128,7 +128,7 @@ index 6dd634e1..94357424 100755
  
  # XXX Cabal has a bizarre layout that we can't control directly. It
 diff --git a/haskell/private/cc_wrapper.py.tpl b/haskell/private/cc_wrapper.py.tpl
-index 311c0f96..bfb17cdd 100644
+index 311c0f96..a4e26f9c 100644
 --- a/haskell/private/cc_wrapper.py.tpl
 +++ b/haskell/private/cc_wrapper.py.tpl
 @@ -86,15 +86,27 @@ CPU = os.environ.get("CC_WRAPPER_CPU", "{:cpu:}")
@@ -165,7 +165,7 @@ index 311c0f96..bfb17cdd 100644
      args.extend(rpath_args(rpaths))
 -    run_cc(args, exit_on_error=True)
 +    environ = os.environ.copy()
-+    environ["NIX_DEBUG"] = "1"
++    environ["NIX_DEBUG"] = "7"
 +    run_cc(args, exit_on_error=True, env=environ)
  
      if is_darwin():
