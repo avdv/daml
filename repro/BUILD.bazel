@@ -18,6 +18,12 @@ cc_library(
     linkstatic = True,
 )
 
+cc_binary(
+    name = "cbin",
+    srcs = ["main.cc"],
+    deps = [":libclib"],
+)
+
 da_haskell_library(
     name = "hsclib",
     srcs = ["Lib.hsc"],
