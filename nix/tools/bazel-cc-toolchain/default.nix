@@ -36,7 +36,7 @@ let
         echo "-Wno-unused-command-line-argument" >> $out/nix-support/cc-cflags
         echo "-mmacosx-version-min=${cc.darwinMinVersion}" >> $out/nix-support/cc-cflags
         echo "-isystem ${llvmPackages_12.libcxx.dev}/include/c++/v1" >> $out/nix-support/cc-cflags
-        echo "-isystem ${cc}/lib/clang/${cc.version}/include" >> $out/nix-support/cc-cflags
+        echo "-isystem ${llvmPackages_12.clang-unwrapped.lib}/lib/clang/${cc.version}/include" >> $out/nix-support/cc-cflags
         echo "-F${CoreFoundation}/Library/Frameworks" >> $out/nix-support/cc-cflags
         echo "-F${CoreServices}/Library/Frameworks" >> $out/nix-support/cc-cflags
         echo "-F${Security}/Library/Frameworks" >> $out/nix-support/cc-cflags
