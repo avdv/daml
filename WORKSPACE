@@ -754,6 +754,16 @@ yarn_install(
     package_json = "//navigator/frontend:package.json",
     symlink_node_modules = False,
     yarn_lock = "//navigator/frontend:yarn.lock",
+) if not is_windows else create_workspace(
+    name = "navigator_frontend_deps",
+    files = {
+        #          "eslint/BUILD.bazel": 'exports_files(["index.bzl"])',
+        #          "eslint/index.bzl": "def eslint_test(*args, **kwargs):\n    pass",
+        #          "jest-cli/BUILD.bazel": 'exports_files(["index.bzl"])',
+        #          "jest-cli/index.bzl": "def jest_test(*args, **kwargs):\n    pass",
+        "@bazel/typescript/BUILD.bazel": 'exports_files(["index.bzl"])',
+        "@bazel/typescript/index.bzl": "def ts_project(*args, **kwargs):\n    pass",
+    },
 )
 
 # We’ve had a bunch of problems with typescript rules on Windows.

@@ -3,7 +3,10 @@
 
 load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_binary")
 load("@os_info//:os_info.bzl", "is_windows")
-# load ("@npm_bazel_typescript//:index.bzl", "ts_library")
+load("@navigator_frontend_deps//@bazel/typescript/index.bzl", "ts_project")
+
+#load("//language-support/ts:defs.bzl", "da_ts_library")
+#load("//language-support/ts:jest.bzl", "jest_test")
 
 filegroup(
     name = "src",
@@ -157,3 +160,45 @@ genrule(
         "//navigator:__subpackages__",
     ],
 )
+
+ts_project(
+    name = "ui-core",
+    srcs = glob(
+        include = ["**/*.ts*"],
+        exclude = ["**/*.test.ts*"],
+    ),
+    tsconfig = ":tsconfig.json",
+    deps = [
+        "@navigator_frontend_deps//:node_modules",
+    ],
+)
+#js_library(
+#    name = name,
+#    package_name = module_name,
+#    deps = [],
+#    **kwargs
+#)
+
+#da_ts_library(
+#    name = "ui-core",
+#    srcs = glob(
+#        include = ["**/*.ts*"],
+#        exclude = ["**/*.test.ts*"],
+#    ),
+#    module_name = "@daml/ui-core",
+#    deps = [
+#        "@navigator_frontend_deps//:node_modules",
+#    ],
+#) if not is_windows else None
+#
+#jest_test(
+#    name = "test",
+#    # Use the js outputs because jest cannot resolve imports in the ts_library
+#    # despite moduleNameMapper.
+#    srcs = ["**/*.test.ts*"],
+#    jest_config = ":jest.config.js",
+#    tsconfig = ":tsconfig.json",
+#    deps = [
+#        ":ui-core",
+#    ],
+#)
