@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@bazel/hide-bazel-files": "^1.7.0",
+    "@bazel/typescript": "^4.6.1",
     "@types/async": "^3.2.5",
     "@types/babel-core": "^6.25.3",
     "@types/classnames": "^2.2.11",

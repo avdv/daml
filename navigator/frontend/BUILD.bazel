@@ -3,7 +3,7 @@
 
 load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_binary")
 load("@os_info//:os_info.bzl", "is_windows")
-load("@navigator_frontend_deps//@bazel/typescript/index.bzl", "ts_project")
+load("@navigator_frontend_deps//@bazel/typescript:index.bzl", "ts_project")
 
 #load("//language-support/ts:defs.bzl", "da_ts_library")
 #load("//language-support/ts:jest.bzl", "jest_test")
