@@ -1,6 +1,7 @@
 # Copyright (c) 2022 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+load("@rules_haskell//haskell:cabal.bzl", "haskell_cabal_library")
 load("//bazel_tools:haskell.bzl", "da_haskell_library", "da_haskell_test")
 
 cc_library(
@@ -51,5 +52,18 @@ da_haskell_library(
     srcs = ["Pure.hs"],
     hackage_deps = [
         "base",
+    ],
+)
+
+haskell_cabal_library(
+    name = "cabal-hsc",
+    version = "0.1.0.0",
+    srcs = [
+        "cabal-hsc.cabal",
+        "Lib.hsc",
+    ],
+    deps = [
+        "@stackage//:base",
+        ":libclib",
     ],
 )

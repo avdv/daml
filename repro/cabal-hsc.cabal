@@ -1,0 +1,9 @@
+cabal-version: 2.4
+name: cabal-hsc
+build-type: Simple
+version: 0.1.0.0
+
+library
+    default-language: Haskell2010
+    build-depends: base
+    extra-libraries: _U_S_Srepro_Clibclib___Urepro
