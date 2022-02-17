@@ -64,6 +64,18 @@ index 1cd3f675..f7a2200a 100644
  
      doctest_log = ctx.actions.declare_file(
          "doctest-log-" + ctx.label.name + "-" + target.label.name,
+diff --git a/haskell/private/actions/compile.bzl b/haskell/private/actions/compile.bzl
+index c2225c10..1923f652 100644
+--- a/haskell/private/actions/compile.bzl
++++ b/haskell/private/actions/compile.bzl
+@@ -101,6 +101,7 @@ def _process_hsc_file(hs, cc, hsc_flags, hsc_inputs, hsc_file):
+         """.format(mingw_bin = paths.dirname(cc.tools.cc)) if hs.toolchain.is_windows else ""
+             ) +
+             """
++        set -x
+         # Include libdir in include path just like hsc2hs does.
+         libdir=$({ghc} --print-libdir)
+         # GHC >=9 on Windows stores the includes outside of libdir
 diff --git a/haskell/private/cabal_wrapper.py b/haskell/private/cabal_wrapper.py
 index 6dd634e1..94357424 100755
 --- a/haskell/private/cabal_wrapper.py
