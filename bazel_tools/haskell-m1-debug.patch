@@ -77,7 +77,7 @@ index c2225c10..1923f652 100644
          libdir=$({ghc} --print-libdir)
          # GHC >=9 on Windows stores the includes outside of libdir
 diff --git a/haskell/private/cabal_wrapper.py b/haskell/private/cabal_wrapper.py
-index 6dd634e1..6c27255d 100755
+index 6dd634e1..a56c70f5 100755
 --- a/haskell/private/cabal_wrapper.py
 +++ b/haskell/private/cabal_wrapper.py
 @@ -49,8 +49,8 @@ import sys
@@ -109,7 +109,7 @@ index 6dd634e1..6c27255d 100755
  
  def distdir_prefix():
      # Build into a sibling path of the final binary output location.
-@@ -249,17 +251,23 @@ with mkdtemp(distdir_prefix()) as distdir:
+@@ -249,17 +251,24 @@ with mkdtemp(distdir_prefix()) as distdir:
      runghc_args = [arg.replace("./", execroot + "/") for arg in runghc_args]
      run([runghc] + runghc_args + [setup, "configure", \
          component, \
@@ -125,6 +125,7 @@ index 6dd634e1..6c27255d 100755
          "--with-strip=" + strip,
          "--enable-deterministic", \
 +        "--ghc-option=-keep-tmp-files",
++        "--ghc-option=-v",
 +        "--disable-response-files",
          ] +
          [ "--ghc-option=" + flag.replace("$CC", cc) for flag in toolchain_info["ghc_cc_args"] ] +
@@ -134,7 +135,7 @@ index 6dd634e1..6c27255d 100755
          enable_relocatable_flags + \
          [ \
          # Make `--builddir` a relative path. Using an absolute path would
-@@ -286,17 +294,17 @@ with mkdtemp(distdir_prefix()) as distdir:
+@@ -286,17 +295,17 @@ with mkdtemp(distdir_prefix()) as distdir:
          [ arg.replace("=", "=" + execroot + "/") for arg in path_args ] + \
          [ "--package-db=" + package_database ], # This arg must come last.
          )
