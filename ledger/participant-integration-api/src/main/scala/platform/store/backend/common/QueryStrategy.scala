@@ -59,6 +59,9 @@ trait QueryStrategy {
   /** Boolean predicate */
   def isTrue(booleanColumnName: String): String
 
+  /** Constant boolean to be used in a SELECT clause */
+  def constBoolean(value: Boolean): String
+
   /** ANY SQL clause generation for a number of Long values
     */
   def anyOf(longs: Iterable[Long]): CompositeSql = {
