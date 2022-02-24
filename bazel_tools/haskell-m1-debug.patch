@@ -161,7 +161,7 @@ index 6dd634e1..5dbf2654 100755
  
  # XXX Cabal has a bizarre layout that we can't control directly. It
 diff --git a/haskell/private/cc_wrapper.py.tpl b/haskell/private/cc_wrapper.py.tpl
-index 311c0f96..184e8637 100644
+index 311c0f96..182ad441 100644
 --- a/haskell/private/cc_wrapper.py.tpl
 +++ b/haskell/private/cc_wrapper.py.tpl
 @@ -86,15 +86,27 @@ CPU = os.environ.get("CC_WRAPPER_CPU", "{:cpu:}")
@@ -192,7 +192,15 @@ index 311c0f96..184e8637 100644
          run_cc(parsed.args, exit_on_error=True)
  
  
-@@ -1042,7 +1054,8 @@ def run_cc(args, capture_output=False, exit_on_error=False, **kwargs):
+@@ -937,6 +949,7 @@ def darwin_rewrite_load_commands(rewrites, output):
+     for old, new in rewrites:
+         args.extend(["-change", old, os.path.join("@rpath", new)])
+     if args:
++        debug("INSTALL_NAME_TOOL\n" + "\n".join(f"    {v}" for v in [INSTALL_NAME_TOOL] + args + [output]))
+         subprocess.check_call([INSTALL_NAME_TOOL] + args + [output])
+ 
+ 
+@@ -1042,7 +1055,8 @@ def run_cc(args, capture_output=False, exit_on_error=False, **kwargs):
          stderrbuf: The captured standard error, None if not capture_output.
  
      """
@@ -202,7 +210,7 @@ index 311c0f96..184e8637 100644
          # The capture_output argument to subprocess.run was only added in 3.7.
          new_kwargs = dict(stdout=subprocess.PIPE, stderr=subprocess.PIPE)
          new_kwargs.update(kwargs)
-@@ -1051,18 +1064,34 @@ def run_cc(args, capture_output=False, exit_on_error=False, **kwargs):
+@@ -1051,18 +1065,34 @@ def run_cc(args, capture_output=False, exit_on_error=False, **kwargs):
      cc = find_cc()
  
      def _run_cc(args):
