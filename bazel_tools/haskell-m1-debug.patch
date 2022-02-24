@@ -161,7 +161,7 @@ index 6dd634e1..5dbf2654 100755
  
  # XXX Cabal has a bizarre layout that we can't control directly. It
 diff --git a/haskell/private/cc_wrapper.py.tpl b/haskell/private/cc_wrapper.py.tpl
-index 311c0f96..9317c5aa 100644
+index 311c0f96..79c3c4fa 100644
 --- a/haskell/private/cc_wrapper.py.tpl
 +++ b/haskell/private/cc_wrapper.py.tpl
 @@ -84,17 +84,30 @@ CC = os.environ.get("CC_WRAPPER_CC_PATH", "{:cc:}")
@@ -195,17 +195,19 @@ index 311c0f96..9317c5aa 100644
          run_cc(parsed.args, exit_on_error=True)
  
  
-@@ -937,7 +950,9 @@ def darwin_rewrite_load_commands(rewrites, output):
+@@ -937,7 +950,11 @@ def darwin_rewrite_load_commands(rewrites, output):
      for old, new in rewrites:
          args.extend(["-change", old, os.path.join("@rpath", new)])
      if args:
 +        debug("INSTALL_NAME_TOOL\n" + "\n".join(f"    {v}" for v in [INSTALL_NAME_TOOL] + args + [output]))
          subprocess.check_call([INSTALL_NAME_TOOL] + args + [output])
-+        subprocess.check_call([CODESIGN] + ["-f", "-s", "-"] + [output])
++        os.rename(output, f"{output}.resign")
++        subprocess.check_call([CODESIGN] + ["-f", "-s", "-"] + [f"{output}.resign"])
++        os.rename(f"{output}.resign", output)
  
  
  # --------------------------------------------------------------------
-@@ -1042,7 +1057,8 @@ def run_cc(args, capture_output=False, exit_on_error=False, **kwargs):
+@@ -1042,7 +1059,8 @@ def run_cc(args, capture_output=False, exit_on_error=False, **kwargs):
          stderrbuf: The captured standard error, None if not capture_output.
  
      """
@@ -215,7 +217,7 @@ index 311c0f96..9317c5aa 100644
          # The capture_output argument to subprocess.run was only added in 3.7.
          new_kwargs = dict(stdout=subprocess.PIPE, stderr=subprocess.PIPE)
          new_kwargs.update(kwargs)
-@@ -1051,18 +1067,34 @@ def run_cc(args, capture_output=False, exit_on_error=False, **kwargs):
+@@ -1051,18 +1069,34 @@ def run_cc(args, capture_output=False, exit_on_error=False, **kwargs):
      cc = find_cc()
  
      def _run_cc(args):
