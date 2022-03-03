@@ -604,7 +604,7 @@ load("@io_tweag_rules_nixpkgs//nixpkgs:toolchains/go.bzl", "nixpkgs_go_configure
 
 nixpkgs_go_configure(
     sdk_name = "go",
-    nix_file = "//nix:bazel.nix",
+    nix_file = "//nix:bazel-go-toolchain.nix",
     nix_file_deps = common_nix_file_deps,
     repositories = dev_env_nix_repos,
 ) if not is_windows else None
