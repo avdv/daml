@@ -52,9 +52,9 @@ def _fat_cc_library_impl(ctx):
             ctx.attr.whole_archive_flag +
             [f.path for f in static_libs] +
             ctx.attr.no_whole_archive_flag +
+            (["-framework", "CoreFoundation"] if is_darwin else []) +
             # Some libs seems to depend on libstdc++ implicitely
             (["-lstdc++"] if is_darwin else ["-lstdc++"]) +
-            (["-framework", "CoreFoundation"] if is_darwin else []) +
             # On Windows we have some extra deps.
             (["-lws2_32"] if is_windows else []),
         inputs = static_libs,
