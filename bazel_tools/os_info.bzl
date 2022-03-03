@@ -13,6 +13,7 @@ os_name = "macos" if is_darwin else "linux" if is_linux else "windows"
 
 def _os_info_impl(repository_ctx):
     cpu = get_cpu_value(repository_ctx)
+    print("CPU", cpu)
     os_info_substitutions = {
         "CPU_VALUE": cpu,
     }
