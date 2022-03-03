@@ -1,8 +1,8 @@
 diff --git a/haskell/cabal.bzl b/haskell/cabal.bzl
-index 6f606be3..7bbe6dbf 100644
+index 6be79b0d..843763df 100644
 --- a/haskell/cabal.bzl
 +++ b/haskell/cabal.bzl
-@@ -172,10 +172,11 @@ def _cabal_toolchain_info(hs, cc, workspace_name, runghc):
+@@ -171,10 +171,11 @@ def _cabal_toolchain_info(hs, cc, workspace_name, runghc):
          runghc = runghc.path,
          ar = ar,
          cc = cc.tools.cc,
@@ -65,7 +65,7 @@ index 1cd3f675..f7a2200a 100644
      doctest_log = ctx.actions.declare_file(
          "doctest-log-" + ctx.label.name + "-" + target.label.name,
 diff --git a/haskell/private/actions/compile.bzl b/haskell/private/actions/compile.bzl
-index c2225c10..1923f652 100644
+index 3f3c2c5c..bbb209d0 100644
 --- a/haskell/private/actions/compile.bzl
 +++ b/haskell/private/actions/compile.bzl
 @@ -101,6 +101,7 @@ def _process_hsc_file(hs, cc, hsc_flags, hsc_inputs, hsc_file):
@@ -77,7 +77,7 @@ index c2225c10..1923f652 100644
          libdir=$({ghc} --print-libdir)
          # GHC >=9 on Windows stores the includes outside of libdir
 diff --git a/haskell/private/cabal_wrapper.py b/haskell/private/cabal_wrapper.py
-index 6dd634e1..5dbf2654 100755
+index 1ba677b3..3b63f70e 100755
 --- a/haskell/private/cabal_wrapper.py
 +++ b/haskell/private/cabal_wrapper.py
 @@ -49,8 +49,8 @@ import sys
@@ -91,7 +91,7 @@ index 6dd634e1..5dbf2654 100755
  with open(sys.argv.pop(1)) as json_file:
      json_args = json.load(json_file)
  
-@@ -128,6 +128,7 @@ path_args = json_args["path_args"]
+@@ -129,6 +129,7 @@ path_args = json_args["path_args"]
  
  ar = find_exe(toolchain_info["ar"])
  cc = find_exe(toolchain_info["cc"])
@@ -99,7 +99,7 @@ index 6dd634e1..5dbf2654 100755
  strip = find_exe(toolchain_info["strip"])
  
  def recache_db():
-@@ -156,7 +157,8 @@ def mkdtemp(prefix):
+@@ -157,7 +158,8 @@ def mkdtemp(prefix):
      try:
          yield dirname
      finally:
@@ -109,7 +109,7 @@ index 6dd634e1..5dbf2654 100755
  
  def distdir_prefix():
      # Build into a sibling path of the final binary output location.
-@@ -249,17 +251,26 @@ with mkdtemp(distdir_prefix()) as distdir:
+@@ -254,17 +256,26 @@ with mkdtemp(distdir_prefix()) as distdir:
      runghc_args = [arg.replace("./", execroot + "/") for arg in runghc_args]
      run([runghc] + runghc_args + [setup, "configure", \
          component, \
@@ -137,17 +137,25 @@ index 6dd634e1..5dbf2654 100755
          enable_relocatable_flags + \
          [ \
          # Make `--builddir` a relative path. Using an absolute path would
-@@ -286,17 +297,17 @@ with mkdtemp(distdir_prefix()) as distdir:
-         [ arg.replace("=", "=" + execroot + "/") for arg in path_args ] + \
+@@ -291,24 +302,24 @@ with mkdtemp(distdir_prefix()) as distdir:
+         [ arg.replace("=", "=" + cfg_execroot + "/") for arg in path_args ] + \
          [ "--package-db=" + package_database ], # This arg must come last.
          )
 -    run([runghc] + runghc_args + [setup, "build", "--verbose=0", "--builddir=" + distdir])
 +    run([runghc] + runghc_args + [setup, "build", "--verbose=3", "--builddir=" + distdir])
      if haddock:
 -        run([runghc] + runghc_args + [setup, "haddock", "--verbose=0", "--builddir=" + distdir])
--    run([runghc] + runghc_args + [setup, "install", "--verbose=0", "--builddir=" + distdir])
 +        run([runghc] + runghc_args + [setup, "haddock", "--verbose=3", "--builddir=" + distdir])
-+    run([runghc] + runghc_args + [setup, "install", "--verbose=3", "--builddir=" + distdir])
+     # Setup.hs install fails if the configuration uses relative C header or
+     # library search paths. Instead, we use Setup.hs copy to install the
+     # package files and then manually register the package configuration in the
+     # package-db.
+     # See https://github.com/haskell/cabal/issues/1317#issuecomment-1025942396
+-    run([runghc] + runghc_args + [setup, "copy", "--verbose=0", "--builddir=" + distdir])
++    run([runghc] + runghc_args + [setup, "copy", "--verbose=3", "--builddir=" + distdir])
+     if component.startswith("lib"):
+-        run([runghc] + runghc_args + [setup, "register", "--gen-pkg-config=" + os.path.join(package_database, name + ".conf"), "--verbose=0", "--builddir=" + distdir])
++        run([runghc] + runghc_args + [setup, "register", "--gen-pkg-config=" + os.path.join(package_database, name + ".conf"), "--verbose=3", "--builddir=" + distdir])
      # Bazel builds are not sandboxed on Windows and can be non-sandboxed on
      # other OSs. Operations like executing `configure` scripts can modify the
      # source tree. If the `srcs` attribute uses a glob like `glob(["**"])`,
