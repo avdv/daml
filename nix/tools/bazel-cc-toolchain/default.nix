@@ -3,7 +3,7 @@
 , bintools
 , buildEnv
 , darwin
-, llvmPackages_12
+, llvmPackages_7
 , makeWrapper
 , wrapCCWith
 , overrideCC
@@ -30,18 +30,18 @@ let
   darwinBinutils = darwin.binutils.override { inherit postLinkSignHook; };
   cc-darwin =
     wrapCCWith rec {
-      cc = llvmPackages_12.clang;
+      cc = llvmPackages_7.clang;
       bintools = darwinBinutils;
       extraBuildCommands = with darwin.apple_sdk.frameworks; ''
         echo "-Wno-unused-command-line-argument" >> $out/nix-support/cc-cflags
         echo "-mmacosx-version-min=${cc.darwinMinVersion}" >> $out/nix-support/cc-cflags
-        echo "-isystem ${llvmPackages_12.libcxx.dev}/include/c++/v1" >> $out/nix-support/cc-cflags
-        echo "-isystem ${llvmPackages_12.clang-unwrapped.lib}/lib/clang/${cc.version}/include" >> $out/nix-support/cc-cflags
+        echo "-isystem ${llvmPackages_7.libcxx.dev}/include/c++/v1" >> $out/nix-support/cc-cflags
+        echo "-isystem ${llvmPackages_7.clang-unwrapped.lib}/lib/clang/${cc.version}/include" >> $out/nix-support/cc-cflags
         echo "-F${CoreFoundation}/Library/Frameworks" >> $out/nix-support/cc-cflags
         echo "-F${CoreServices}/Library/Frameworks" >> $out/nix-support/cc-cflags
         echo "-F${Security}/Library/Frameworks" >> $out/nix-support/cc-cflags
         echo "-F${Foundation}/Library/Frameworks" >> $out/nix-support/cc-cflags
-        echo "-L${llvmPackages_12.libcxx}/lib" >> $out/nix-support/cc-cflags
+        echo "-L${llvmPackages_7.libcxx}/lib" >> $out/nix-support/cc-cflags
         echo "-L${darwin.libobjc}/lib" >> $out/nix-support/cc-cflags
       '';
     };
