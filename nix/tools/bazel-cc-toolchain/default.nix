@@ -43,6 +43,7 @@ let
         echo "-F${Security}/Library/Frameworks" >> $out/nix-support/cc-cflags
         echo "-F${Foundation}/Library/Frameworks" >> $out/nix-support/cc-cflags
         echo "-L${llvmPackages_12.libcxx}/lib" >> $out/nix-support/cc-cflags
+        echo "-L${llvmPackages_12.libcxxabi}/lib" >> $out/nix-support/cc-cflags
         echo "-L${darwin.libobjc}/lib" >> $out/nix-support/cc-cflags
       '';
     };
