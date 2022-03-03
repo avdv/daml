@@ -34,6 +34,7 @@ let
       bintools = darwinBinutils;
       extraBuildCommands = with darwin.apple_sdk.frameworks; ''
         echo "-Wno-unused-command-line-argument" >> $out/nix-support/cc-cflags
+        echo "-Wno-elaborated-enum-base" >> $out/nix-support/cc-cflags
         echo "-mmacosx-version-min=${cc.darwinMinVersion}" >> $out/nix-support/cc-cflags
         echo "-isystem ${llvmPackages_12.libcxx.dev}/include/c++/v1" >> $out/nix-support/cc-cflags
         echo "-isystem ${llvmPackages_12.clang-unwrapped.lib}/lib/clang/${cc.version}/include" >> $out/nix-support/cc-cflags
