@@ -44,6 +44,7 @@ final class FailureTests
   private def headersWithParties(actAs: List[String]) =
     headersWithPartyAuth(actAs, List(), ledgerId().unwrap)
 
+  // TEST_EVIDENCE: Semantics: Command submission succeeds after reconnect
   "Command submission succeeds after reconnect" in withHttpService[Assertion] {
     (uri, encoder, _, client) =>
       for {
@@ -92,6 +93,7 @@ final class FailureTests
       } yield succeed
   }
 
+  // TEST_EVIDENCE: Semantics: command submission timeout is applied
   "Command submission timeouts" in withHttpService { (uri, encoder, _, client) =>
     import json.JsonProtocol._
     for {
@@ -137,6 +139,7 @@ final class FailureTests
     } yield succeed
   }
 
+  // TEST_EVIDENCE: Semantics: /v1/query GET succeeds after reconnect
   "/v1/query GET succeeds after reconnect" in withHttpService[Assertion] {
     (uri, encoder, _, client) =>
       for {
@@ -172,6 +175,7 @@ final class FailureTests
       } yield succeed
   }
 
+  // TEST_EVIDENCE: Semantics: /v1/query POST succeeds after reconnect
   "/v1/query POST succeeds after reconnect" in withHttpService[Assertion] {
     (uri, encoder, _, client) =>
       for {
@@ -228,6 +232,7 @@ final class FailureTests
       } yield succeed
   }
 
+  // TEST_EVIDENCE: Semantics: /v1/query POST succeeds after reconnect to DB
   "/v1/query POST succeeds after reconnect to DB" in withHttpService { (uri, encoder, _, client) =>
     for {
       p <- allocateParty(client, "Alice")
@@ -292,6 +297,7 @@ final class FailureTests
     } yield succeed
   }
 
+  // TEST_EVIDENCE: Semantics: /v1/stream/query can reconnect
   "/v1/stream/query can reconnect" in withHttpService { (uri, encoder, _, client) =>
     val query =
       """[
@@ -373,6 +379,7 @@ final class FailureTests
 
   }
 
+  // TEST_EVIDENCE: Semantics: fromStartupMode should not succeed for any input when the db connection is broken
   "fromStartupMode should not succeed for any input when the connection to the db is broken" in {
     import cats.effect.IO
     import DbStartupOps._, com.daml.http.dbbackend.DbStartupMode._,
