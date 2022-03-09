@@ -118,6 +118,7 @@ class HttpServiceIntegrationTestUserManagementNoAuth
       ).toJson
   }
 
+  // TEST_EVIDENCE: Authorization: create IOU should work with correct user rights
   "create IOU should work with correct user rights" in withHttpServiceAndClient {
     (uri, encoder, _, ledgerClient, _) =>
       val alice = getUniqueParty("Alice")
@@ -144,6 +145,7 @@ class HttpServiceIntegrationTestUserManagementNoAuth
       } yield assertion
   }
 
+  // TEST_EVIDENCE: Authorization: create IOU should fail if user has no permission
   "create IOU should fail if user has no permission" in withHttpServiceAndClient {
     (uri, encoder, _, ledgerClient, _) =>
       val alice = getUniqueParty("Alice")
@@ -169,6 +171,7 @@ class HttpServiceIntegrationTestUserManagementNoAuth
       } yield assertion
   }
 
+  // TEST_EVIDENCE: Authorization: create IOU should fail if overwritten actAs & readAs result in missing permission even if the user would have the rights
   "create IOU should fail if overwritten actAs & readAs result in missing permission even if the user would have the rights" in withHttpServiceAndClient {
     (uri, encoder, _, ledgerClient, _) =>
       val alice = getUniqueParty("Alice")
@@ -596,6 +599,7 @@ class HttpServiceIntegrationTestUserManagementNoAuth
       } yield assertion
   }
 
+  // TEST_EVIDENCE: Performance: creating and listing 20K users should be possible
   "creating and listing 20K users should be possible" in withHttpServiceAndClient {
     (uri, _, _, _, _) =>
       import spray.json._
