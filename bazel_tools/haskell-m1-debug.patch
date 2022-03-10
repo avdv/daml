@@ -1,5 +1,5 @@
 diff --git a/haskell/cabal.bzl b/haskell/cabal.bzl
-index 6be79b0d..843763df 100644
+index 6be79b0d..1e324ec5 100644
 --- a/haskell/cabal.bzl
 +++ b/haskell/cabal.bzl
 @@ -171,10 +171,11 @@ def _cabal_toolchain_info(hs, cc, workspace_name, runghc):
@@ -11,12 +11,12 @@ index 6be79b0d..843763df 100644
          is_windows = hs.toolchain.is_windows,
          workspace = workspace_name,
 -        ghc_cc_args = ghc_cc_program_args(hs, "$CC"),
-+        ghc_cc_args = ghc_cc_program_args(hs, "$CC", cc.tools.ld),
++        ghc_cc_args = ghc_cc_program_args(hs, "$CC", "$LD"),
      )
  
  def _prepare_cabal_inputs(
 diff --git a/haskell/cc.bzl b/haskell/cc.bzl
-index 3726133c..1eeee540 100644
+index 3726133c..6ef44e55 100644
 --- a/haskell/cc.bzl
 +++ b/haskell/cc.bzl
 @@ -186,11 +186,12 @@ def cc_interop_info(ctx, override_cc_toolchain = None):
@@ -42,15 +42,18 @@ index 3726133c..1eeee540 100644
          # Setting -pgm* flags explicitly has the unfortunate side effect
          # of resetting any program flags in the GHC settings file. So we
          # restore them here. See
-@@ -217,6 +220,8 @@ def ghc_cc_program_args(hs, cc):
-         "-pgmP",
-         cc + " -E -undef -traditional",
-         "-optc-fno-stack-protector",
-+        "-optlm",
-+        "-r",
+@@ -220,4 +223,11 @@ def ghc_cc_program_args(hs, cc):
      ]
      if hs.toolchain.numeric_version >= [8, 10, 3]:
          args.append("-pgmc-supports-no-pie")
++    if hs.toolchain.numeric_version >= [9, 0, 1]:
++        args.extend([
++            "-pgmlm",
++            ld,
++            "-optlm",
++            "-r",
++        ])
+     return args
 diff --git a/haskell/doctest.bzl b/haskell/doctest.bzl
 index 1cd3f675..f7a2200a 100644
 --- a/haskell/doctest.bzl
@@ -77,7 +80,7 @@ index 3f3c2c5c..bbb209d0 100644
          libdir=$({ghc} --print-libdir)
          # GHC >=9 on Windows stores the includes outside of libdir
 diff --git a/haskell/private/cabal_wrapper.py b/haskell/private/cabal_wrapper.py
-index 1ba677b3..3b63f70e 100755
+index 1ba677b3..e58b735d 100755
 --- a/haskell/private/cabal_wrapper.py
 +++ b/haskell/private/cabal_wrapper.py
 @@ -49,8 +49,8 @@ import sys
@@ -109,7 +112,7 @@ index 1ba677b3..3b63f70e 100755
  
  def distdir_prefix():
      # Build into a sibling path of the final binary output location.
-@@ -254,17 +256,26 @@ with mkdtemp(distdir_prefix()) as distdir:
+@@ -254,17 +256,25 @@ with mkdtemp(distdir_prefix()) as distdir:
      runghc_args = [arg.replace("./", execroot + "/") for arg in runghc_args]
      run([runghc] + runghc_args + [setup, "configure", \
          component, \
@@ -127,17 +130,17 @@ index 1ba677b3..3b63f70e 100755
 +        "--ghc-option=-keep-tmp-files",
 +        "--ghc-option=-v",
 +        "--disable-response-files",
-         ] +
-         [ "--ghc-option=" + flag.replace("$CC", cc) for flag in toolchain_info["ghc_cc_args"] ] +
-+        [ "--hsc2hs-option=-c" + cc,
-+          "--hsc2hs-option=-l" + cc,
-+          "--hsc2hs-option=-v",
-+          "--hsc2hs-option=-k",
 +        ] +
++        [ "--ghc-option=" + flag.replace("$CC", cc).replace("$LD", ld) for flag in toolchain_info["ghc_cc_args"] ] +
++        [ "--hsc2hs-option=-c" + cc, "--hsc2hs-option=-l" + ld ] +
++        [ "--hsc2hs-option=-v",
++          "--hsc2hs-option=-k",
+         ] +
+-        [ "--ghc-option=" + flag.replace("$CC", cc) for flag in toolchain_info["ghc_cc_args"] ] +
          enable_relocatable_flags + \
          [ \
          # Make `--builddir` a relative path. Using an absolute path would
-@@ -291,24 +302,24 @@ with mkdtemp(distdir_prefix()) as distdir:
+@@ -291,24 +301,24 @@ with mkdtemp(distdir_prefix()) as distdir:
          [ arg.replace("=", "=" + cfg_execroot + "/") for arg in path_args ] + \
          [ "--package-db=" + package_database ], # This arg must come last.
          )
@@ -266,24 +269,30 @@ index 311c0f96..79c3c4fa 100644
              if capture_output:
                  sys.stdout.buffer.write(stdoutbuf)
 diff --git a/haskell/repl.bzl b/haskell/repl.bzl
-index 6cc44499..ab001cd6 100644
+index 6cc44499..0833ec92 100644
 --- a/haskell/repl.bzl
 +++ b/haskell/repl.bzl
-@@ -396,7 +396,7 @@ def _create_repl(hs, cc, posix, ctx, repl_info, output):
+@@ -396,7 +396,12 @@ def _create_repl(hs, cc, posix, ctx, repl_info, output):
          "$RULES_HASKELL_EXEC_ROOT",
          hs.toolchain.cc_wrapper.executable.path,
      )
 -    args.extend(['"{}"'.format(arg) for arg in ghc_cc_program_args(hs, cc_path)])
-+    args.extend(['"{}"'.format(arg) for arg in ghc_cc_program_args(hs, cc_path, cc.tools.ld)])
++    ld_path = paths.join(
++        "$RULES_HASKELL_EXEC_ROOT",
++        cc.ld_executable,
++    )
++    args.extend(['"{}"'.format(arg) for arg in ghc_cc_program_args(hs, cc_path, ld_path)])
++
  
      # Load source files
      # Force loading by source with `:add *...`.
-@@ -518,7 +518,7 @@ def _create_hie_bios(hs, cc, posix, ctx, repl_info, path_prefix):
+@@ -518,7 +523,8 @@ def _create_hie_bios(hs, cc, posix, ctx, repl_info, path_prefix):
      path_prefix = paths.join("", *path_prefix)
      args, inputs = _compiler_flags_and_inputs(hs, cc, repl_info, path_prefix = path_prefix, static = True)
      cc_path = paths.join(path_prefix, hs.toolchain.cc_wrapper.executable.path)
 -    args.extend(ghc_cc_program_args(hs, cc_path))
-+    args.extend(ghc_cc_program_args(hs, cc_path, cc.tools.ld))
++    ld_path = paths.join(path_prefix, cc.ld_executable)
++    args.extend(ghc_cc_program_args(hs, cc_path, ld_path))
      args.extend(hs.toolchain.ghcopts)
      args.extend(repl_info.load_info.compiler_flags)
  
