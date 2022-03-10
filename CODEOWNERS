@@ -63,10 +63,10 @@ NOTICES     @garyverhaegen-da @cocreature @dasormeter
 # KV Participant
 /ledger/participant-integration-api/      @digital-asset/kv-participant
 
+
 # KV Committer
 /ledger/ledger-on-memory/           @digital-asset/kv-committer
 /ledger/participant-state/kvutils/  @digital-asset/kv-committer
-
 
 
 # Ecosystems
