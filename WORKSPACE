@@ -603,7 +603,6 @@ nixpkgs_java_configure(
 load("@io_tweag_rules_nixpkgs//nixpkgs:toolchains/go.bzl", "nixpkgs_go_configure")
 
 nixpkgs_go_configure(
-    sdk_name = "go",
     nix_file = "//nix:bazel-go-toolchain.nix",
     nix_file_deps = common_nix_file_deps,
     repositories = dev_env_nix_repos,
@@ -624,7 +623,7 @@ load("@io_bazel_rules_go//go:deps.bzl", "go_rules_dependencies")
 
 go_rules_dependencies()
 
-gazelle_dependencies(go_sdk = "nixpkgs_go_sdk") if not is_windows else gazelle_dependencies()
+gazelle_dependencies()
 
 load("@go_googleapis//:repository_rules.bzl", "switched_rules_by_language")
 
