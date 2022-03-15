@@ -107,15 +107,27 @@ def daml_deps():
             sha256 = rules_haskell_sha256,
         )
 
-    if "io_tweag_rules_nixpkgs" not in native.existing_rules():
-        http_archive(
-            name = "io_tweag_rules_nixpkgs",
-            strip_prefix = "rules_nixpkgs-%s" % rules_nixpkgs_version,
-            urls = ["https://github.com/tweag/rules_nixpkgs/archive/%s.tar.gz" % rules_nixpkgs_version],
-            sha256 = rules_nixpkgs_sha256,
-            patches = rules_nixpkgs_patches,
-            patch_args = ["-p1"],
-        )
+    native.local_repository(
+        name = "io_tweag_rules_nixpkgs",
+        path = "../rules_nixpkgs",
+    )
+
+    #http_archive(
+    #    name = "io_tweag_rules_nixpkgs",
+    #    strip_prefix = "rules_nixpkgs-44016ae08089c0857174168eadf81a07fe2400f7",
+    #    urls = ["https://github.com/tweag/rules_nixpkgs/archive/44016ae08089c0857174168eadf81a07fe2400f7.tar.gz"],
+    #    sha256 = "62ca71dfc05047aca0622691a7c66df97623e7f313cefe87f2219d8726034c4c",
+    #)
+
+    #if "io_tweag_rules_nixpkgs" not in native.existing_rules():
+    #    http_archive(
+    #        name = "io_tweag_rules_nixpkgs",
+    #        strip_prefix = "rules_nixpkgs-%s" % rules_nixpkgs_version,
+    #        urls = ["https://github.com/tweag/rules_nixpkgs/archive/%s.tar.gz" % rules_nixpkgs_version],
+    #        sha256 = rules_nixpkgs_sha256,
+    #        patches = rules_nixpkgs_patches,
+    #        patch_args = ["-p1"],
+    #    )
 
     if "com_github_madler_zlib" not in native.existing_rules():
         http_archive(

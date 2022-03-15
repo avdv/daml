@@ -33,6 +33,9 @@ register_toolchains(
     "//:c2hs-toolchain",
 )
 
+load("@io_tweag_rules_nixpkgs//nixpkgs:repositories.bzl", "rules_nixpkgs_dependencies")
+rules_nixpkgs_dependencies(local = "../rules_nixpkgs")
+
 load("//bazel_tools/dev_env_tool:dev_env_tool.bzl", "dadew", "dev_env_tool")
 load(
     "@io_tweag_rules_nixpkgs//nixpkgs:nixpkgs.bzl",
@@ -404,7 +407,7 @@ common_ghc_flags = [
 # Used by Darwin and Linux
 haskell_register_ghc_nixpkgs(
     attribute_path = "ghcDwarf" if enable_ghc_dwarf else "ghc",
-    build_file = "@io_tweag_rules_nixpkgs//nixpkgs:BUILD.pkg",
+    #build_file = "@io_tweag_rules_nixpkgs//nixpkgs:BUILD.pkg",
 
     # -fexternal-dynamic-refs is required so that we produce position-independent
     # relocations against some functions (-fPIC alone isn’t sufficient).
