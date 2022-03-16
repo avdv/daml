@@ -47,8 +47,8 @@ rules_haskell_patches = [
     "@com_github_digital_asset_daml//bazel_tools:haskell-ghc-includes.patch",
 ]
 rules_nixpkgs_name = "io_tweag_rules_nixpkgs"
-rules_nixpkgs_version = "b4967da9f979bb9802d1a70e80ba3e8afae1d20b"
-rules_nixpkgs_sha256 = "47b7b8800115749904f598c8962ff285f1727a5654821a47154cbf34a57a5353"
+rules_nixpkgs_version = "4a2efda5d94d31bbfe84b466f2211dd93ee432cf"
+rules_nixpkgs_sha256 = "247736cfb9298b5d589db5ef834b7d4007a189fbdc54ca028d883cb8e6ed6b5d"
 rules_nixpkgs_patches = [
     # On CI and locally we observe occasional segmantation faults
     # of nix. A known issue since Nix 2.2.2 is that HTTP2 support
