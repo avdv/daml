@@ -33,9 +33,6 @@ register_toolchains(
     "//:c2hs-toolchain",
 )
 
-load("@io_tweag_rules_nixpkgs//nixpkgs:repositories.bzl", "rules_nixpkgs_dependencies")
-rules_nixpkgs_dependencies(local = "../rules_nixpkgs")
-
 load("//bazel_tools/dev_env_tool:dev_env_tool.bzl", "dadew", "dev_env_tool")
 load(
     "@io_tweag_rules_nixpkgs//nixpkgs:nixpkgs.bzl",

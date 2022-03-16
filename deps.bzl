@@ -46,8 +46,9 @@ rules_haskell_patches = [
     # This should be upstreamed
     "@com_github_digital_asset_daml//bazel_tools:haskell-ghc-includes.patch",
 ]
-rules_nixpkgs_version = "81f61c4b5afcf50665b7073f7fce4c1755b4b9a3"
-rules_nixpkgs_sha256 = "33fd540d0283cf9956d0a5a640acb1430c81539a84069114beaf9640c96d221a"
+rules_nixpkgs_name = "io_tweag_rules_nixpkgs"
+rules_nixpkgs_version = "b4967da9f979bb9802d1a70e80ba3e8afae1d20b"
+rules_nixpkgs_sha256 = "47b7b8800115749904f598c8962ff285f1727a5654821a47154cbf34a57a5353"
 rules_nixpkgs_patches = [
     # On CI and locally we observe occasional segmantation faults
     # of nix. A known issue since Nix 2.2.2 is that HTTP2 support
@@ -107,27 +108,69 @@ def daml_deps():
             sha256 = rules_haskell_sha256,
         )
 
-    native.local_repository(
-        name = "io_tweag_rules_nixpkgs",
-        path = "../rules_nixpkgs",
-    )
+    if rules_nixpkgs_name not in native.existing_rules():
+        http_archive(
+            name = "io_tweag_rules_nixpkgs",
+            strip_prefix = "rules_nixpkgs-%s" % rules_nixpkgs_version,
+            urls = ["https://github.com/tweag/rules_nixpkgs/archive/%s.tar.gz" % rules_nixpkgs_version],
+            sha256 = rules_nixpkgs_sha256,
+            #patches = rules_nixpkgs_patches,
+            #patch_args = ["-p1"],
+        )
 
-    #http_archive(
-    #    name = "io_tweag_rules_nixpkgs",
-    #    strip_prefix = "rules_nixpkgs-44016ae08089c0857174168eadf81a07fe2400f7",
-    #    urls = ["https://github.com/tweag/rules_nixpkgs/archive/44016ae08089c0857174168eadf81a07fe2400f7.tar.gz"],
-    #    sha256 = "62ca71dfc05047aca0622691a7c66df97623e7f313cefe87f2219d8726034c4c",
-    #)
+    # the following complication is due to migrating to `bzlmod`.
+    # fetch extracted submodules as external repositories from an existing source tree, based on the import type.
+    rules_nixpkgs = native.existing_rule(rules_nixpkgs_name)
 
-    #if "io_tweag_rules_nixpkgs" not in native.existing_rules():
-    #    http_archive(
-    #        name = "io_tweag_rules_nixpkgs",
-    #        strip_prefix = "rules_nixpkgs-%s" % rules_nixpkgs_version,
-    #        urls = ["https://github.com/tweag/rules_nixpkgs/archive/%s.tar.gz" % rules_nixpkgs_version],
-    #        sha256 = rules_nixpkgs_sha256,
-    #        patches = rules_nixpkgs_patches,
-    #        patch_args = ["-p1"],
-    #    )
+    kind = rules_nixpkgs.get("kind")
+
+    strip_prefix = rules_nixpkgs.get("strip_prefix", "")
+    if strip_prefix:
+        strip_prefix += "/"
+
+    for name, prefix in [
+        ("rules_nixpkgs_core", "core"),
+        ("rules_nixpkgs_cc", "toolchains/cc"),
+        ("rules_nixpkgs_java", "toolchains/java"),
+        ("rules_nixpkgs_python", "toolchains/python"),
+        ("rules_nixpkgs_posix", "toolchains/posix"),
+    ]:
+        # case analysis in inner loop to reduce code duplication
+        if kind == "local_repository":
+            path = rules_nixpkgs.get("path")
+            maybe(native.local_repository, name, path = "{}/{}".format(path, prefix))
+        elif kind == "http_archive":
+            maybe(
+                http_archive,
+                name,
+                strip_prefix = strip_prefix + prefix,
+                # there may be more attributes needed. please submit a pull request to support your use case.
+                url = rules_nixpkgs.get("url"),
+                urls = rules_nixpkgs.get("urls"),
+                sha256 = rules_nixpkgs.get("sha256"),
+            )
+        elif kind == "git_repository":
+            maybe(
+                git_repository,
+                name,
+                strip_prefix = strip_prefix + prefix,
+                # there may be more attributes needed. please submit a pull request to support your use case.
+                remote = rules_nixpkgs.get("remote"),
+                commit = rules_nixpkgs.get("commit"),
+                branch = rules_nixpkgs.get("branch"),
+                tag = rules_nixpkgs.get("tag"),
+                shallow_since = rules_nixpkgs.get("shallow_since"),
+            )
+        else:
+            errormsg = [
+                "Could not find any import type for `rules_nixpkgs`.",
+                "This should not happen. If you encounter this using the latest release",
+                "of `rules_nixpkgs`, please file an issue describing your use case:",
+                "https://github.com/tweag/rules_nixpkgs/issues",
+                "or submit a pull request with corrections:",
+                "https://github.com/tweag/rules_nixpkgs/pulls",
+            ]
+            fail("\n".join(errormsg))
 
     if "com_github_madler_zlib" not in native.existing_rules():
         http_archive(
